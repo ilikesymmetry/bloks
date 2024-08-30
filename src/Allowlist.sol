@@ -4,52 +4,65 @@ pragma solidity ^0.8.23;
 import {LibString} from "solady/utils/LibString.sol";
 
 abstract contract Allowlist {
-    // binary code: 00000011111111111111111111111111000000111111111111111111111111110000000111111111100000000000000000000000000000000000000000000000
-    uint128 private constant onlyAlphaNumerics = 0x03FFFFFF03FFFFFF01FF800000000000;
+    // supported characters: [a-z][A-Z][0-9]-_
+    uint128 private immutable ONLY_ALPHA_NUMERICS;
 
     mapping(bytes32 listName => mapping(address account => bool allowed)) private _allowlist;
 
-    event AllowlistUpdated(bytes32 indexed listName, address indexed account, bool allowed);
+    event AllowlistUpdated(string listName, address account, bool allowed);
 
     error NotAllowed(bytes32 listName, address account);
 
-    error ListNameOverflow();
+    constructor() {
+        ONLY_ALPHA_NUMERICS =
+            LibString.to7BitASCIIAllowedLookup("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_-");
+    }
 
-    function updateAllowlist(bytes32 listName, address account, bool allowed) public virtual {
-        _authorizeAllowlistUpdate(listName, account, allowed);
-        _allowlist[listName][account] = allowed;
-        emit AllowlistUpdated(listName, account, allowed);
+    function updateAllowlist(bytes32 listName, address account, bool allowed) external virtual {
+        _updateAllowlist(listName, account, allowed);
+    }
+
+    function updateAllowlist(string calldata listName, address account, bool allowed) external virtual {
+        _updateAllowlist(toBytes32(listName), account, allowed);
     }
 
     function isAllowed(bytes32 listName, address account) public view virtual returns (bool) {
         return _allowlist[listName][account];
     }
 
+    function isAllowed(string memory listName, address account) public view returns (bool) {
+        return isAllowed(toBytes32(listName), account);
+    }
+
     function requireAllowed(bytes32 listName, address account) public view virtual {
         if (!isAllowed(listName, account)) revert NotAllowed(listName, account);
     }
 
-    function isAllowed(string calldata listName, address account) public view returns (bool) {
-        _validateListName(listName);
-        return isAllowed(toBytes32(listName), account);
-    }
-
-    function requireAllowed(string calldata listName, address account) public view {
-        _validateListName(listName);
+    function requireAllowed(string memory listName, address account) public view virtual {
         requireAllowed(toBytes32(listName), account);
     }
 
-    function toBytes32(string calldata listName) public pure returns (bytes32) {
-        return bytes32(bytes(listName));
+    function toBytes32(string memory listName) public view returns (bytes32) {
+        _validateListName(listName);
+        return LibString.toSmallString(listName);
     }
 
-    function toString(bytes32 listName) public pure returns (string memory) {
-        return string(abi.encode(listName));
+    function toString(bytes32 listName) public view returns (string memory) {
+        string memory s = LibString.fromSmallString(listName);
+        _validateListName(s);
+        return s;
     }
 
-    function _validateListName(string calldata listName) private pure {
-        if (!LibString.is7BitASCII(listName, onlyAlphaNumerics)) revert LibString.StringNot7BitASCII();
-        if (bytes(listName).length > 32) revert ListNameOverflow();
+    function _updateAllowlist(bytes32 listName, address account, bool allowed) internal virtual {
+        _authorizeAllowlistUpdate(listName, account, allowed);
+        string memory s = LibString.fromSmallString(listName);
+        _validateListName(s);
+        _allowlist[listName][account] = allowed;
+        emit AllowlistUpdated(s, account, allowed);
+    }
+
+    function _validateListName(string memory listName) internal view {
+        if (!LibString.is7BitASCII(listName, ONLY_ALPHA_NUMERICS)) revert LibString.StringNot7BitASCII();
     }
 
     function _authorizeAllowlistUpdate(bytes32 listName, address account, bool allowed) internal view virtual;
