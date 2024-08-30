@@ -1,66 +1,21 @@
-## Foundry
+## Based
 
-**Foundry is a blazing fast, portable and modular toolkit for Ethereum application development written in Rust.**
+An opinionated library of base contracts for common onchain management.
 
-Foundry consists of:
+All contracts are designed with namespaced storage layouts for easy integration in upgradeable contracts.
 
--   **Forge**: Ethereum testing framework (like Truffle, Hardhat and DappTools).
--   **Cast**: Swiss army knife for interacting with EVM smart contracts, sending transactions and getting chain data.
--   **Anvil**: Local Ethereum node, akin to Ganache, Hardhat Network.
--   **Chisel**: Fast, utilitarian, and verbose solidity REPL.
+### Base contracts
 
-## Documentation
+- [ ] `Ownable2Step`: Single owner with required 2-step change process, renouncing blocked.
+- [ ] `Signable2Step`: Single signer with required 2-step rotation process.
+- [ ] `Pausable`: Simple pausing.
+- [ ] `Withdrawable`: Withdraw native and ERC20 tokens to prevent asset lockout.
+- [ ] `Allowlist`: General address allowlists with customizable list names.
 
-https://book.getfoundry.sh/
+### Install
 
-## Usage
-
-### Build
-
-```shell
-$ forge build
+```bash
+forge install ilikesymmetry/solbase
 ```
 
-### Test
-
-```shell
-$ forge test
-```
-
-### Format
-
-```shell
-$ forge fmt
-```
-
-### Gas Snapshots
-
-```shell
-$ forge snapshot
-```
-
-### Anvil
-
-```shell
-$ anvil
-```
-
-### Deploy
-
-```shell
-$ forge script script/Counter.s.sol:CounterScript --rpc-url <your_rpc_url> --private-key <your_private_key>
-```
-
-### Cast
-
-```shell
-$ cast <subcommand>
-```
-
-### Help
-
-```shell
-$ forge --help
-$ anvil --help
-$ cast --help
-```
+It is recommended to NOT use a remapping so that you can also intuitively import mocks within the `test/` directory.
