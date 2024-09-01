@@ -2,13 +2,41 @@
 pragma solidity ^0.8.23;
 
 interface IAllowlist {
-    event AllowlistUpdated(string listName, address account, bool allowed);
+    /// @notice Allowlist was updated.
+    ///
+    /// @dev Params not indexed for better human-readability on block explorers.
+    ///
+    /// @param list Name of the list.
+    /// @param account Address of the account on the allowlist.
+    /// @param allowed True if `account` is now allowed on `list`.
+    event AllowlistUpdated(string list, address account, bool allowed);
 
-    error NotAllowed(string listName, address account);
+    /// @notice Allowlist condition failed.
+    ///
+    /// @param list Name of the list.
+    /// @param account Address of the account on the allowlist.
+    error NotAllowed(string list, address account);
 
-    function updateAllowlist(string calldata listName, address account, bool allowed) external;
+    /// @notice Update allowlist entry.
+    ///
+    /// @param list Name of the list.
+    /// @param account Address of the account on the allowlist.
+    /// @param allowed True if `account` is now allowed on `list`.
+    function updateAllowlist(string calldata list, address account, bool allowed) external;
 
-    function isAllowed(string memory listName, address account) external view returns (bool);
+    /// @notice Check allowlist membership.
+    ///
+    /// @param list Name of the list.
+    /// @param account Address of the account on the allowlist.
+    ///
+    /// @return allowed True if `account` is on `list`.
+    function isAllowed(string memory list, address account) external view returns (bool);
 
-    function requireAllowed(string memory listName, address account) external view;
+    /// @notice Enforce allowlist membership.
+    ///
+    /// @dev Reverts if not allowed.
+    ///
+    /// @param list Name of the list.
+    /// @param account Address of the account on the allowlist.
+    function requireAllowed(string memory list, address account) external view;
 }

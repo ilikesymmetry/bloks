@@ -4,11 +4,11 @@ An opinionated smart contract library for onchain operations.
 
 ## Base contracts
 
-- `[##---] 40%` `Allowlist`: General address allowlists with customizable list names.
+- `[####-] 80%` `Allowlist`: General address allowlists with customizable list names.
+- `[####-] 80%` `AllowlistEnumerable`: `Allowlist` with full enumerability without indexers.
 - `[##---] 40%` `Signable2Step`: Single signer with required 2-step rotation process.
-- `[-----] 00%` `Ownable2Step`: Single owner with required 2-step change process, renouncing blocked.
-- `[-----] 00%` `Pausable`: Simple pausing.
-- `[-----] 00%` `Withdrawable`: Withdraw native and ERC20 tokens to prevent asset lockout.
+
+If you would like to see more bloks, [DM to connect](x.com/ilikesymmetry).
 
 ## Install
 
