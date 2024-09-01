@@ -4,7 +4,7 @@ pragma solidity ^0.8.23;
 import {Test} from "forge-std/Test.sol";
 import {LibString} from "solady/utils/LibString.sol";
 
-import {AllowlistEnumerable} from "../../src/Allowlist/AllowlistEnumerable.sol";
+import {AllowlistEnumerable} from "../../src/mixins/AllowlistEnumerable.sol";
 
 import {MockContract} from "../mocks/MockContract.sol";
 
