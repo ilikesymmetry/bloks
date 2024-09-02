@@ -7,9 +7,11 @@ import {MockContract} from "../test/mocks/MockContract.sol";
 
 // forge script Deploy --account dev --sender $SENDER --rpc-url $BASE_SEPOLIA_RPC --verify --verifier-url $SEPOLIA_BASESCAN_API --etherscan-api-key $BASESCAN_API_KEY --broadcast -vvvv
 contract Deploy is Script {
+    address owner = address(0xa11ce);
+
     function run() public {
         vm.startBroadcast();
 
-        new MockContract{salt: 0}();
+        new MockContract{salt: 0}(owner);
     }
 }

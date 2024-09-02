@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.0;
+pragma solidity ^0.8.23;
 
 /// @title Signer2Step
 ///
@@ -8,7 +8,7 @@ pragma solidity ^0.8.0;
 /// @author Conner Swenberg (@ilikesymmetry).
 abstract contract Signer2Step {
     /// @notice EOA or smart contract that is able to sign messages.
-    address public primarySigner;
+    address public signer;
 
     /// @notice Pending signer that is able to sign messages.
     ///
@@ -64,20 +64,6 @@ abstract contract Signer2Step {
         delete pendingSigner;
     }
 
-    /// @notice Check if address is the primary signer or pending signer.
-    ///
-    /// @param signer Address to check.
-    function isValidSigner(address signer) public view returns (bool) {
-        return signer == primarySigner || signer == pendingSigner;
-    }
-
-    /// @notice Require address is a valid signer.
-    ///
-    /// @param signer Address to check.
-    function requireValidSigner(address signer) internal view {
-        if (!isValidSigner(signer)) revert InvalidSigner(signer);
-    }
-
     /// @notice Set pending signer in storage and emit event.
     ///
     /// @param newSigner Address of signer that is able to sign messages.
@@ -90,16 +76,30 @@ abstract contract Signer2Step {
     ///
     /// @param newSigner Address of signer that is able to sign messages.
     function _setSigner(address newSigner) internal {
-        address oldSigner = primarySigner;
-        primarySigner = newSigner;
+        address oldSigner = signer;
+        signer = newSigner;
         emit SignerRotated(oldSigner, newSigner);
+    }
+
+    /// @notice Check if address is the primary signer or pending signer.
+    ///
+    /// @param account Address to check.
+    function _isValidSigner(address account) internal view returns (bool) {
+        return account == signer || account == pendingSigner;
+    }
+
+    /// @notice Require address is a valid signer.
+    ///
+    /// @param account Address to check.
+    function _requireValidSigner(address account) internal view {
+        if (!_isValidSigner(account)) revert InvalidSigner(account);
     }
 
     /// @notice Revert if signer is `address(0)`.
     ///
-    /// @param signer Address to check.
-    function _requireNonZeroSigner(address signer) internal pure {
-        if (signer == address(0)) revert SignerIsZeroAddress();
+    /// @param account Address to check.
+    function _requireNonZeroSigner(address account) internal pure {
+        if (account == address(0)) revert SignerIsZeroAddress();
     }
 
     /// @notice Authorize setting a signer.
